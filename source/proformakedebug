@@ -1,0 +1,26 @@
+echo Executando o preprocessador Fortran -> PRO*C
+profor -log /dts21/bin/sqlprofor.log $1.pfo
+if [ "$?" = "0" ]; then
+  echo OK 
+else
+  echo Falhou
+  exit
+fi
+echo Executando o PRO*C
+proc $1.pc
+if [ "$?" = "0" ]; then
+  echo OK
+else
+  echo Falhou
+  exit
+fi
+echo Compilando com o gcc
+echo gcc -g -O3   -DPRECOMP  -lf2c -lclntsh -lm -I.  -I. -I/u01/app/oracle/product/8.1.7/precomp/public -DLINUX -D_GNU_SOURCE -DSLTS_ENABLE -DSLMXMX_ENABLE -D_REENTRANT -DNS_THREADS -o digital -L/u01/app/oracle/product/8.1.7/precomp/lib/ -L/u01/app/oracle/product/8.1.7/lib/  $1.c    `cat /u01/app/oracle/product/8.1.7/lib/sysliblist` -ldl -lm  -o $1 
+gcc -g -O3   -DPRECOMP  -lf2c -lclntsh -lm -I.  -I. -I/u01/app/oracle/product/8.1.7/precomp/public -DLINUX -D_GNU_SOURCE -DSLTS_ENABLE -DSLMXMX_ENABLE -D_REENTRANT -DNS_THREADS     -o digital -L/u01/app/oracle/product/8.1.7/precomp/lib/ -L/u01/app/oracle/product/8.1.7/lib/  $1.c    `cat /u01/app/oracle/product/8.1.7/lib/sysliblist` -ldl -lm  -o $1
+if [ "$?" = "0" ]; then
+  echo OK
+else
+  echo Falhou
+  exit
+fi
+

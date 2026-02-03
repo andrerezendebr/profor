@@ -1,0 +1,72 @@
+      PROGRAM CURSOR
+
+      CHARACTER*10   TESTEandre
+
+
+      EXEC SQL BEGIN DECLARE SECTION
+         CHARACTER*10   UID
+         CHARACTER*10   PWD
+         INTEGER*4      ID_ENLADIG
+         CHARACTER*3    CODIGO_CLIENTE
+      EXEC SQL END DECLARE SECTION
+
+
+						INTEGER   TESTE2
+
+      EXEC SQL INCLUDE SQLCA
+      EXEC SQL WHENEVER SQLERROR DO CALL SQLERR
+
+*     Log on no oracle.
+      UID = 'GERENTE'
+      PWD = ''
+      TESTEandre = 'TESTE'
+      TESTE2 = 20
+						
+      EXEC SQL CONNECT :UID IDENTIFIED BY :PWD
+      PRINT *, ''
+      PRINT *, 'Connectado ao oracle como o usuário: ', UID
+
+*     Declarando o cursor.
+      EXEC SQL DECLARE ENLADIG_CURSOR CURSOR FOR
+     1    SELECT ID_ENLADIG, CODIGO_CLIENTE 
+     2    FROM TB_ENLADIG ORDER BY ID_ENLADIG
+      EXEC SQL OPEN ENLADIG_CURSOR
+
+      TESTEandre = 'TESTE'
+
+
+      PRINT *, ''
+      PRINT *, 'ID_ENLADIG  CODIGO_CLIENTE'
+      PRINT *, '----------  --------------'
+     
+
+*     Listando todos os enladigs
+
+      EXEC SQL WHENEVER NOT FOUND DO CALL SIGNOFF
+3000  EXEC SQL FETCH ENLADIG_CURSOR INTO :ID_ENLADIG, :CODIGO_CLIENTE
+C     PRINT '(1X, A10, 3X, A3)', ID_ENLADIG, CODIGO_CLIENTE
+      PRINT '(1X, I10, 3X, A3)', ID_ENLADIG, CODIGO_CLIENTE
+C      PRINT '(1X, F8.2, 3X, A3)', ID_ENLADIG, CODIGO_CLIENTE
+      GOTO 3000
+      END
+
+      SUBROUTINE SIGNOFF
+	      EXEC SQL INCLUDE SQLCA
+	      EXEC SQL CLOSE ENLADIG_CURSOR
+	      PRINT *, ''
+	      PRINT *, 'Fim de listagem. asasasasasa'
+	      EXEC SQL COMMIT WORK RELEASE 
+	      STOP
+      END
+
+      SUBROUTINE SQLERR
+	      CHARACTER*70   SQLEMC
+	      EXEC SQL INCLUDE SQLCA
+	      EXEC SQL WHENEVER SQLERROR CONTINUE
+	      PRINT *, 'Erro no Oracle:'
+	      PRINT '(70A1)', SQLEMC
+	      EXEC SQL ROLLBACK WORK RELEASE
+	      STOP
+      END
+
+
